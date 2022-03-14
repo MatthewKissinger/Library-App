@@ -1,9 +1,46 @@
+:root {
+    font-size: 16px;
+}
+
 * {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
 }
 
+body {
+    display: grid;
+    grid-template-rows: 10vh 80vh 10vh;
+}
+
+header {
+    display: flex;
+    align-items: center;
+}
+
 h1 {
     color: purple;
+    padding: 2rem;
+}
+
+main {
+    padding: 2rem;
+    background-color: rgb(240, 240, 240);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 200px);
+    gap: 3rem;
+}
+
+.card {
+    height: 300px;
+    width: 200px;
+    border-radius: 6px;
+    background-color: white;
+    box-shadow: rgba(60, 64, 67, 0.2) 0px 1px 5px 0px
+}
+
+footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
