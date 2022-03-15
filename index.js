@@ -14,6 +14,7 @@ const readValue = document.querySelector('#read');
 const submitBookBtn = document.querySelector('#submit-new-book');
 
 
+
 // Event Listeners
 
 addBookButton.addEventListener('click', function() {
@@ -27,22 +28,27 @@ submitBookBtn.addEventListener('click', function(e) {
     toggleHideClass(newBookForm);
 })
 
+window.addEventListener('click', function(e) {
+    removeCard(e);
+    updateReadButton(e);
+})
+
 // global variables
 
 // library array
 let myLibrary = [
-    {
-        title: 'The Pillars of the Earth',
-        author: 'Ken Follett',
-        pages: 806,
-        read: false
-    },
-    {
-        title: 'The Hobbit', 
-        author: 'J.R.R. Tolkien',
-        pages: 310,
-        read: true
-    }
+    // {
+    //     title: 'The Pillars of the Earth',
+    //     author: 'Ken Follett',
+    //     pages: 806,
+    //     read: false, 
+    // },
+    // {
+    //     title: 'The Hobbit', 
+    //     author: 'J.R.R. Tolkien',
+    //     pages: 310,
+    //     read: true
+    // }
 ];
 
 // book constructor function
@@ -53,12 +59,28 @@ function Book (title, author, pages, read) {
     this.read = read
 }
 
+Book.prototype.updateReadStatus = function() {
+    if (this.read === true) {
+        this.read = false;
+    } else {
+        this.read = true;
+    }
+}
+
+let newBook1 = new Book('The Pillars of the Earth', 'Ken Follett', 806, false);
+
+let newBook2 = new Book('The Hobbit', 'J.R.R. Tolkien', 310, true);
+
+myLibrary.push(newBook1);
+myLibrary.push(newBook2);
+
+
 // methods
 
 function displayLibrary(array) {
     cardContainer.innerHTML = '';
 
-    array.forEach((book) => {
+    array.forEach((book, index) => {
         let card = document.createElement('div');
         card.classList.add('card');
 
@@ -78,14 +100,20 @@ function displayLibrary(array) {
             readButton.classList.add('read');
             readButton.innerText = 'Read';
         } else {
-            readButton.classList.add('not-read')
-            readButton.innerText = 'Not Read Yet'
+            readButton.classList.add('not-read');
+            readButton.innerText = 'Not Read Yet';
         }
+
+        let deleteButton = document.createElement('div');
+        deleteButton.classList.add('delete-btn');
+        deleteButton.innerText = 'X';
 
         card.appendChild(title);
         card.appendChild(author);
         card.appendChild(pageTotal);
         card.appendChild(readButton);
+        card.appendChild(deleteButton);
+        card.setAttribute('data-index', `${index}`)
 
         cardContainer.appendChild(card);
     }) 
@@ -102,10 +130,10 @@ function addBookToLibrary() {
 
     let newBook = new Book(title.value, author.value, pages.value, read);
 
+    newBook.prototype = Object.create(Book.prototype);
+
     myLibrary.push(newBook);
     displayLibrary(myLibrary);
-
-    console.log(newBook);
 }
 
 function clearNewBookForm() {
@@ -116,6 +144,30 @@ function clearNewBookForm() {
 
 function toggleHideClass(element) {
     element.classList.toggle('hide');
+}
+
+function removeCard(e) {
+    if (e.target.classList.contains('delete-btn')) {
+        let index = e.target.parentElement.getAttribute('data-index');
+        myLibrary.splice(index, 1);
+        displayLibrary(myLibrary);
+    }
+}
+
+function updateReadButton(e) {
+    if (e.target.classList.contains('read')) {
+        let index = e.target.parentElement.getAttribute('data-index');
+        myLibrary[index].updateReadStatus();
+        e.target.classList.add('not-read');
+        e.target.innerText = 'Not Read Yet';
+    } else if (e.target.classList.contains('not-read')) {
+        let index = e.target.parentElement.getAttribute('data-index');
+        myLibrary[index].updateReadStatus();
+        e.target.classList.add('read');
+        e.target.innerText = 'Read'; 
+    }
+
+    displayLibrary(myLibrary);
 }
 
 displayLibrary(myLibrary);
