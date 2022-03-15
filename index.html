@@ -12,9 +12,6 @@
     <header>
         <h1>Bookshelf App</h1>
         <button id="add-book-btn">+ Book</button>
-    </header>
-
-    <main>
         <form action="post" id="new-book-form" class="hide">
             <h3>Enter Book Info</h3>
             <div class="title-container">
@@ -33,9 +30,13 @@
                 <label for="read" name="read">Read</label>
                 <input type="radio" name="read" id="read">
                 <label for="not-read">Unfinished</label>
-                <input type="radio" name="read" id="not-read-yet">
+                <input type="radio" name="read" id="not-read-yet" checked>
             </div>
+            <button id="submit-new-book">Add to Library</button>
         </form>
+    </header>
+
+    <main>
     </main>
 
     <footer>

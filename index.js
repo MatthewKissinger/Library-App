@@ -4,13 +4,27 @@ console.log('Bookshelf App connected');
 
 const cardContainer = document.querySelector('main');
 const addBookButton = document.querySelector('#add-book-btn');
+
+// form variables
 const newBookForm = document.querySelector('form');
+const formTitle = document.querySelector('#title');
+const formAuthor = document.querySelector('#author');
+const formPageCount = document.querySelector('#pages');
+const readValue = document.querySelector('#read');
+const submitBookBtn = document.querySelector('#submit-new-book');
+
 
 // Event Listeners
 
 addBookButton.addEventListener('click', function() {
-    console.log('you cliked the add a new book button');
-    newBookForm.classList.toggle('hide');
+    toggleHideClass(newBookForm);
+})
+
+submitBookBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    addBookToLibrary();
+    clearNewBookForm();
+    toggleHideClass(newBookForm);
 })
 
 // global variables
@@ -42,6 +56,8 @@ function Book (title, author, pages, read) {
 // methods
 
 function displayLibrary(array) {
+    cardContainer.innerHTML = '';
+
     array.forEach((book) => {
         let card = document.createElement('div');
         card.classList.add('card');
@@ -76,7 +92,30 @@ function displayLibrary(array) {
 }
 
 function addBookToLibrary() {
-    let newBook = new Book();
+    let read = '';
+
+    if (readValue.checked) {
+        read = true;
+    } else {
+        read = false;
+    }
+
+    let newBook = new Book(title.value, author.value, pages.value, read);
+
+    myLibrary.push(newBook);
+    displayLibrary(myLibrary);
+
+    console.log(newBook);
+}
+
+function clearNewBookForm() {
+    title.value = '';
+    author.value = '';
+    pages.value = '';
+}
+
+function toggleHideClass(element) {
+    element.classList.toggle('hide');
 }
 
 displayLibrary(myLibrary);
