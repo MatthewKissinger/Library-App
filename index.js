@@ -13,10 +13,7 @@ const formPageCount = document.querySelector('#pages');
 const readValue = document.querySelector('#read');
 const submitBookBtn = document.querySelector('#submit-new-book');
 
-
-
 // Event Listeners
-
 addBookButton.addEventListener('click', function() {
     toggleHideClass(newBookForm);
 })
@@ -37,35 +34,27 @@ window.addEventListener('click', function(e) {
 
 // library array
 let myLibrary = [
-    // {
-    //     title: 'The Pillars of the Earth',
-    //     author: 'Ken Follett',
-    //     pages: 806,
-    //     read: false, 
-    // },
-    // {
-    //     title: 'The Hobbit', 
-    //     author: 'J.R.R. Tolkien',
-    //     pages: 310,
-    //     read: true
-    // }
 ];
 
 // book constructor function
-function Book (title, author, pages, read) {
-    this.title = title, 
-    this.author = author, 
-    this.pages = pages, 
-    this.read = read
+class Book {
+    constructor(title, author, pages, read) {
+        this.title = title;
+        this.author = author;
+        this.pages = pages;
+        this.read = read;
+    }
+
+    updateReadStatus() {
+        if (this.read === true) {
+            this.read = false;
+        } else {
+            this.read = true;
+        }
+    }
+
 }
 
-Book.prototype.updateReadStatus = function() {
-    if (this.read === true) {
-        this.read = false;
-    } else {
-        this.read = true;
-    }
-}
 
 let newBook1 = new Book('The Pillars of the Earth', 'Ken Follett', 806, false);
 
