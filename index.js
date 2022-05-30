@@ -13,16 +13,19 @@ const formPageCount = document.querySelector('#pages');
 const readValue = document.querySelector('#read');
 const submitBookBtn = document.querySelector('#submit-new-book');
 
+console.log(formTitle.validity);
+
 // Event Listeners
 addBookButton.addEventListener('click', function() {
     toggleHideClass(newBookForm);
 })
 
-submitBookBtn.addEventListener('click', function(e) {
+newBookForm.addEventListener('submit', function(e) {
     e.preventDefault();
     addBookToLibrary();
     clearNewBookForm();
     toggleHideClass(newBookForm);
+    
 })
 
 window.addEventListener('click', function(e) {
