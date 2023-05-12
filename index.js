@@ -1,4 +1,3 @@
-console.log('Bookshelf App connected');
 
 // DOM cache
 
@@ -11,9 +10,10 @@ const formTitle = document.querySelector('#title');
 const formAuthor = document.querySelector('#author');
 const formPageCount = document.querySelector('#pages');
 const readValue = document.querySelector('#read');
+const notReadYet = document.querySelector('#not-read-yet');
 const submitBookBtn = document.querySelector('#submit-new-book');
 
-console.log(formTitle.validity);
+console.log(formTitle.value);
 
 // Event Listeners
 addBookButton.addEventListener('click', function() {
@@ -120,7 +120,7 @@ function addBookToLibrary() {
         read = false;
     }
 
-    let newBook = new Book(title.value, author.value, pages.value, read);
+    let newBook = new Book(formTitle.value, formAuthor.value, formPageCount.value, read);
 
     newBook.prototype = Object.create(Book.prototype);
 
@@ -129,9 +129,10 @@ function addBookToLibrary() {
 }
 
 function clearNewBookForm() {
-    title.value = '';
-    author.value = '';
-    pages.value = '';
+    formTitle.value = '';
+    formAuthor.value = '';
+    formPageCount.value = '';
+    notReadYet.checked = true;
 }
 
 function toggleHideClass(element) {
