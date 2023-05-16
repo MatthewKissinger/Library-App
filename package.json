@@ -1,0 +1,28 @@
+{
+  "name": "library-app",
+  "version": "1.0.0",
+  "description": "Personal Library App",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode=development"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatthewKissinger/Library-App.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MatthewKissinger/Library-App/issues"
+  },
+  "homepage": "https://github.com/MatthewKissinger/Library-App#readme",
+  "dependencies": {
+    "firebase": "^9.22.0"
+  },
+  "devDependencies": {
+    "webpack": "^5.82.1",
+    "webpack-cli": "^5.1.1"
+  }
+}
