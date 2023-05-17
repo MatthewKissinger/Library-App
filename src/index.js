@@ -1,5 +1,11 @@
 import { initializeApp } from 'firebase/app';
+import { getFirestore, doc, addDoc, getDocs, collection, query } from "firebase/firestore";
 
+// global variables
+
+// library array
+let myLibrary = [
+];
 
 //Firebase setup
 
@@ -12,11 +18,30 @@ const firebaseConfig = {
     appId: "1:423646578385:web:95fc2e751bdced64a5a7f0"
   };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
+// Initialize Cloud Firestore and get a reference to the service
+const firestore = getFirestore(app);
+
+// const libraryArray = collection(firestore, "libraryArray");
+
+async function queryForDocuments() {
+    const libraryArrayQuery = query(
+        collection(firestore, "libraryArray")
+    );
+
+    const querySnapshot = await getDocs(libraryArrayQuery);
+    const allDocs = querySnapshot.forEach((snap) => {
+        console.log(snap.data());
+        myLibrary.push(snap.data());
+        displayLibrary(myLibrary);
+    })
+}
+
+// queryForDocuments();
 
 // DOM cache
-
 const cardContainer = document.querySelector('main');
 const addBookButton = document.querySelector('#add-book-btn');
 
@@ -27,9 +52,6 @@ const formAuthor = document.querySelector('#author');
 const formPageCount = document.querySelector('#pages');
 const readValue = document.querySelector('#read');
 const notReadYet = document.querySelector('#not-read-yet');
-const submitBookBtn = document.querySelector('#submit-new-book');
-
-console.log(formTitle.value);
 
 // Event Listeners
 addBookButton.addEventListener('click', function() {
@@ -49,12 +71,6 @@ window.addEventListener('click', function(e) {
     updateReadButton(e);
 })
 
-// global variables
-
-// library array
-let myLibrary = [
-];
-
 // book constructor function
 class Book {
     constructor(title, author, pages, read) {
@@ -71,17 +87,29 @@ class Book {
             this.read = true;
         }
     }
-
 }
 
+// Firestore converter for data that has functions
 
-let newBook1 = new Book('The Pillars of the Earth', 'Ken Follett', 806, false);
+const bookConverter = {
+    toFirestore: (book) => {
+        return {
+            title: book.title,
+            author: book.author,
+            pages: book.pages,
+            read: book.read
+            };
+    },
+    fromFirestore: (snapshot, options) => {
+        const data = snapshot.data(options);
+        return new Book(data.title, data.author, data.pages, data.read);
+    }
+};
 
-let newBook2 = new Book('The Hobbit', 'J.R.R. Tolkien', 310, true);
-
-myLibrary.push(newBook1);
-myLibrary.push(newBook2);
-
+async function addANewDocument(book) {
+    const ref = doc(firestore, "libraryArray", "book1").withConverter(bookConverter);
+    await addDoc(ref, new Book(book));
+}
 
 // methods
 
@@ -137,9 +165,11 @@ function addBookToLibrary() {
     }
 
     let newBook = new Book(formTitle.value, formAuthor.value, formPageCount.value, read);
+    console.log(newBook);
 
     newBook.prototype = Object.create(Book.prototype);
 
+    addANewDocument(newBook);
     myLibrary.push(newBook);
     displayLibrary(myLibrary);
 }
