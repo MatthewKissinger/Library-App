@@ -1,11 +1,15 @@
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, addDoc, getDocs, collection, query } from "firebase/firestore";
 
+// TODO
+// 1) add a new book to the firestore database
+// 2) fix the update read status function 
+// 3) fix the remove book function 
+
 // global variables
 
 // library array
-let myLibrary = [
-];
+let myLibrary = [];
 
 //Firebase setup
 
@@ -22,24 +26,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Initialize Cloud Firestore and get a reference to the service
-const firestore = getFirestore(app);
+const db = getFirestore(app);
 
-// const libraryArray = collection(firestore, "libraryArray");
+// reference to the libraryArray collection 
+const libraryArray = collection(db, "libraryArray");
 
-async function queryForDocuments() {
-    const libraryArrayQuery = query(
-        collection(firestore, "libraryArray")
-    );
+// function to add a new doc to the firestore and re-render the page to show the new doc
+function addANewDoc(book) {
 
-    const querySnapshot = await getDocs(libraryArrayQuery);
-    const allDocs = querySnapshot.forEach((snap) => {
-        console.log(snap.data());
-        myLibrary.push(snap.data());
-        displayLibrary(myLibrary);
-    })
 }
 
-// queryForDocuments();
+// initialize the site with collection data from a query to the firestore on first render
+async function queryForDocs() {
+    const colRef = query(collection(db, "libraryArray"));
+
+    const querySnapshot = await getDocs(colRef);
+    querySnapshot.forEach((snap) => {
+        console.log(snap.data());
+        myLibrary.push(snap.data());
+    })
+    displayLibrary(myLibrary);
+    console.log(myLibrary);
+}
+queryForDocs();
 
 // DOM cache
 const cardContainer = document.querySelector('main');
@@ -79,36 +88,6 @@ class Book {
         this.pages = pages;
         this.read = read;
     }
-
-    updateReadStatus() {
-        if (this.read === true) {
-            this.read = false;
-        } else {
-            this.read = true;
-        }
-    }
-}
-
-// Firestore converter for data that has functions
-
-const bookConverter = {
-    toFirestore: (book) => {
-        return {
-            title: book.title,
-            author: book.author,
-            pages: book.pages,
-            read: book.read
-            };
-    },
-    fromFirestore: (snapshot, options) => {
-        const data = snapshot.data(options);
-        return new Book(data.title, data.author, data.pages, data.read);
-    }
-};
-
-async function addANewDocument(book) {
-    const ref = doc(firestore, "libraryArray", "book1").withConverter(bookConverter);
-    await addDoc(ref, new Book(book));
 }
 
 // methods
@@ -165,13 +144,9 @@ function addBookToLibrary() {
     }
 
     let newBook = new Book(formTitle.value, formAuthor.value, formPageCount.value, read);
-    console.log(newBook);
 
-    newBook.prototype = Object.create(Book.prototype);
-
-    addANewDocument(newBook);
-    myLibrary.push(newBook);
-    displayLibrary(myLibrary);
+    addANewDoc(newBook);
+    queryForDocs();
 }
 
 function clearNewBookForm() {
@@ -185,6 +160,8 @@ function toggleHideClass(element) {
     element.classList.toggle('hide');
 }
 
+// grab the title of the book -> check that string with the documents in the firestore collection
+// remove that doc from the firestore and re-query the database
 function removeCard(e) {
     if (e.target.classList.contains('delete-btn')) {
         let index = e.target.parentElement.getAttribute('data-index');
@@ -193,6 +170,9 @@ function removeCard(e) {
     }
 }
 
+// update the read value of the doc in firestore collection
+// grab the title of the book -> check that string with the documents 
+// re-query the database
 function updateReadButton(e) {
     if (e.target.classList.contains('read')) {
         let index = e.target.parentElement.getAttribute('data-index');
@@ -205,10 +185,8 @@ function updateReadButton(e) {
         e.target.classList.add('read');
         e.target.innerText = 'Read'; 
     }
-
     displayLibrary(myLibrary);
 }
 
-displayLibrary(myLibrary);
 
 
