@@ -1,8 +1,8 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, addDoc, getDocs, collection, query } from "firebase/firestore";
+import { getFirestore, doc, updateDoc, addDoc, getDocs, collection, query } from "firebase/firestore";
 
 // TODO
-// 1) add a new book to the firestore database
+// 1) add a new book to the firestore database -- DONE
 // 2) fix the update read status function 
 // 3) fix the remove book function 
 
@@ -32,8 +32,18 @@ const db = getFirestore(app);
 const libraryArray = collection(db, "libraryArray");
 
 // function to add a new doc to the firestore and re-render the page to show the new doc
-function addANewDoc(book) {
+async function addANewDoc(book) {
+    // Add a new document with a generated id.
+    const docRef = await addDoc(collection(db, "libraryArray"), {
+    ...book
+    });
+    console.log("Document written with ID: ", docRef.id);
 
+    const docRefId = docRef.id;
+    const updateDocRef = doc(db, "libraryArray", docRefId);
+    await updateDoc(updateDocRef, {
+        id: docRefId
+    });
 }
 
 // initialize the site with collection data from a query to the firestore on first render
@@ -42,11 +52,20 @@ async function queryForDocs() {
 
     const querySnapshot = await getDocs(colRef);
     querySnapshot.forEach((snap) => {
-        console.log(snap.data());
-        myLibrary.push(snap.data());
+        // check to see if the docID already exists in the collection
+        // if so, do not push it to myLibrary
+        // else, push it to myLibrary
+        
+        const checkTitle = obj => obj.title === snap.data().title;
+
+        if (myLibrary.some(checkTitle) === true) {
+            return; 
+        } else {
+            myLibrary.push(snap.data());
+        }
+        
     })
     displayLibrary(myLibrary);
-    console.log(myLibrary);
 }
 queryForDocs();
 
@@ -95,9 +114,11 @@ class Book {
 function displayLibrary(array) {
     cardContainer.innerHTML = '';
 
-    array.forEach((book, index) => {
+    array.forEach((book) => {
+
         let card = document.createElement('div');
         card.classList.add('card');
+        card.setAttribute('id', book.id);
 
         let title = document.createElement('h3');
         title.innerText = book.title;
@@ -128,7 +149,6 @@ function displayLibrary(array) {
         card.appendChild(pageTotal);
         card.appendChild(readButton);
         card.appendChild(deleteButton);
-        card.setAttribute('data-index', `${index}`)
 
         cardContainer.appendChild(card);
     }) 
@@ -164,8 +184,13 @@ function toggleHideClass(element) {
 // remove that doc from the firestore and re-query the database
 function removeCard(e) {
     if (e.target.classList.contains('delete-btn')) {
-        let index = e.target.parentElement.getAttribute('data-index');
-        myLibrary.splice(index, 1);
+        const docRefId = e.target.parentElement.id;
+        console.log(docRefId);
+        // delete from firestore
+
+        // find index of book in myLibraryArray and pop it from the array
+        
+
         displayLibrary(myLibrary);
     }
 }
@@ -173,19 +198,24 @@ function removeCard(e) {
 // update the read value of the doc in firestore collection
 // grab the title of the book -> check that string with the documents 
 // re-query the database
-function updateReadButton(e) {
+async function updateReadButton(e) {
     if (e.target.classList.contains('read')) {
-        let index = e.target.parentElement.getAttribute('data-index');
-        myLibrary[index].updateReadStatus();
-        e.target.classList.add('not-read');
-        e.target.innerText = 'Not Read Yet';
+        const docRefId = e.target.parentElement.id;
+
+        const updateDocRef = doc(db, "libraryArray", docRefId);
+        await updateDoc(updateDocRef, {
+        read: false
+        });
     } else if (e.target.classList.contains('not-read')) {
-        let index = e.target.parentElement.getAttribute('data-index');
-        myLibrary[index].updateReadStatus();
-        e.target.classList.add('read');
-        e.target.innerText = 'Read'; 
+        const docRefId = e.target.parentElement.id;
+
+        const updateDocRef = doc(db, "libraryArray", docRefId);
+        await updateDoc(updateDocRef, {
+        read: true
+        });
     }
-    displayLibrary(myLibrary);
+    myLibrary = [];
+    queryForDocs();
 }
 
 
