@@ -1,5 +1,14 @@
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, updateDoc, addDoc, getDocs, collection, query } from "firebase/firestore";
+import { 
+    getFirestore, 
+    doc, 
+    updateDoc, 
+    addDoc, 
+    deleteDoc,
+    getDocs, 
+    collection, 
+    query 
+} from "firebase/firestore";
 
 // TODO
 // 1) add a new book to the firestore database -- DONE
@@ -66,6 +75,7 @@ async function queryForDocs() {
         
     })
     displayLibrary(myLibrary);
+    console.log(myLibrary);
 }
 queryForDocs();
 
@@ -154,7 +164,7 @@ function displayLibrary(array) {
     }) 
 }
 
-function addBookToLibrary() {
+async function addBookToLibrary() {
     let read = '';
 
     if (readValue.checked) {
@@ -165,7 +175,8 @@ function addBookToLibrary() {
 
     let newBook = new Book(formTitle.value, formAuthor.value, formPageCount.value, read);
 
-    addANewDoc(newBook);
+    // made it await for the docref ID to be added to the firestore doc
+    await addANewDoc(newBook);
     queryForDocs();
 }
 
@@ -182,16 +193,14 @@ function toggleHideClass(element) {
 
 // grab the title of the book -> check that string with the documents in the firestore collection
 // remove that doc from the firestore and re-query the database
-function removeCard(e) {
+async function removeCard(e) {
     if (e.target.classList.contains('delete-btn')) {
         const docRefId = e.target.parentElement.id;
         console.log(docRefId);
         // delete from firestore
-
-        // find index of book in myLibraryArray and pop it from the array
-        
-
-        displayLibrary(myLibrary);
+        await deleteDoc(doc(db, "libraryArray", docRefId));
+        myLibrary = [];
+        queryForDocs();
     }
 }
 
@@ -206,6 +215,8 @@ async function updateReadButton(e) {
         await updateDoc(updateDocRef, {
         read: false
         });
+        myLibrary = [];
+        queryForDocs();
     } else if (e.target.classList.contains('not-read')) {
         const docRefId = e.target.parentElement.id;
 
@@ -213,9 +224,9 @@ async function updateReadButton(e) {
         await updateDoc(updateDocRef, {
         read: true
         });
-    }
-    myLibrary = [];
-    queryForDocs();
+        myLibrary = [];
+        queryForDocs();
+    } 
 }
 
 
