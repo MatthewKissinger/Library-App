@@ -9,11 +9,10 @@ import {
     collection, 
     query 
 } from "firebase/firestore";
+import "./style.css";
 
 // TODO
-// 1) add a new book to the firestore database -- DONE
-// 2) fix the update read status function 
-// 3) fix the remove book function 
+// Host with github
 
 // global variables
 
